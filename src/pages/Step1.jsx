@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
+import { useData } from "../context/DataContext";
+
 import MainContainer from "../components/MainContainer";
 import Form from "../components/Form";
 import Input from "../components/Input";
@@ -24,18 +26,24 @@ const schema = yup.object().shape({
 
 const Step1 = () => {
   const navigate = useNavigate();
+  const { data, setValues } = useData();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({
+    defaultValues: {
+      firstName: data.firstName,
+      lastName: data.lastName,
+    },
     mode: "onBlur",
     resolver: yupResolver(schema),
   });
 
   const onSubmit = (data) => {
     navigate("/step2");
+    setValues(data);
   };
   return (
     <MainContainer>
@@ -61,7 +69,7 @@ const Step1 = () => {
           error={!!errors?.lastName}
           helperText={errors?.lastName?.message}
         />
-        <PrimaryButton>Next</PrimaryButton>
+        <PrimaryButton disabled={!isValid}>Next</PrimaryButton>
       </Form>
     </MainContainer>
   );

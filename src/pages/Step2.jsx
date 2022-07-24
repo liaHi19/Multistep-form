@@ -7,6 +7,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Checkbox, FormControlLabel, Typography } from "@mui/material";
 
+import { useData } from "../context/DataContext";
+
 import MainContainer from "../components/MainContainer";
 import Form from "../components/Form";
 import Input from "../components/Input";
@@ -16,8 +18,20 @@ import parsePhoneNumberFromString from "libphonenumber-js";
 const schema = yup.object().shape({
   email: yup
     .string()
-    .email("Email should have correct format")
-    .required("Email is a required field"),
+    .email("* Email should have correct format")
+    .required("* Email is a required field"),
+  hasPhone: yup.boolean(),
+  phoneNumber: yup.string().when("hasPhone", {
+    is: true,
+    then: yup
+      .string()
+      .matches(
+        /^(\+|00)[1-9][0-9 \-\(\)\.]{7,14}$/gi,
+        "* Please enter a valid phone number"
+      )
+      .required("* Please enter your phone number"),
+    otherwise: yup.string().notRequired(),
+  }),
 });
 
 const normalizePhoneNumber = (value) => {
@@ -29,13 +43,18 @@ const normalizePhoneNumber = (value) => {
 };
 
 const Step2 = () => {
+  const { data, setValues } = useData();
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
   } = useForm({
+    defaultValues: {
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+    },
     mode: "onBlur",
     resolver: yupResolver(schema),
   });
@@ -43,8 +62,8 @@ const Step2 = () => {
   const hasPhone = watch("hasPhone");
 
   const onSubmit = (data) => {
-    console.log(data);
     navigate("/step3");
+    setValues(data);
   };
   return (
     <MainContainer>
@@ -82,9 +101,11 @@ const Step2 = () => {
             onChange={(e) => {
               e.target.value = normalizePhoneNumber(e.target.value);
             }}
+            error={!!errors.phoneNumber}
+            helperText={errors?.phoneNumber?.message}
           />
         )}
-        <PrimaryButton>Next</PrimaryButton>
+        <PrimaryButton disabled={!isValid}>Next</PrimaryButton>
       </Form>
     </MainContainer>
   );
