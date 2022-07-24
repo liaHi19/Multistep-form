@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext } from "react";
 
 const DataContext = createContext();
 
@@ -6,8 +6,8 @@ export const DataProvider = ({ children }) => {
   const [data, setData] = useState({});
 
   const setValues = (values) => {
-    setData((prev) => ({
-      ...prev,
+    setData((prevData) => ({
+      ...prevData,
       ...values,
     }));
   };
@@ -19,6 +19,4 @@ export const DataProvider = ({ children }) => {
   );
 };
 
-export const useData = () => {
-  useContext(DataContext);
-};
+export const useData = () => useContext(DataContext);
