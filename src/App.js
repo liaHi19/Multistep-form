@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Step1 from "./pages/Step1";
 import Step2 from "./pages/Step2";
-const Step3 = () => <div>Step3</div>;
+import Step3 from "./pages/Step3";
 
 const Result = () => <div>Result</div>;
 
